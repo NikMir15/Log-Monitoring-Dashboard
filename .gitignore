@@ -1,0 +1,19 @@
+# Elastic / Docker data
+esdata/
+.elastic/
+data/
+
+# Logs
+*.log
+
+# OS / Editor
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment files
+.env
