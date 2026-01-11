@@ -1,91 +1,56 @@
 # Log Monitoring Dashboard (ELK Stack)
 
 ## Overview
-This project implements a centralized log monitoring system using the ELK Stack.
-It collects structured logs from multiple services, processes them in real time,
-and visualizes insights through Kibana dashboards.
-
-The project demonstrates production-grade DevOps logging and observability practices.
-
----
-
-## Architecture
-Application Services → Filebeat → Logstash → Elasticsearch → Kibana
-
-yaml
-Copy code
-
----
+This project demonstrates a production-style log monitoring system built using the ELK stack (Elasticsearch, Logstash, Kibana) with Docker.  
+It collects application logs, processes them centrally, and visualizes insights such as error trends and service-level logs in real time.
 
 ## Tech Stack
 - Docker & Docker Compose
 - Elasticsearch
 - Logstash
-- Kibana
+- Kibana (Lens dashboards)
 - Filebeat
-- Python (log-generating services)
+- Python (sample apps)
+- Windows + VS Code
 
----
+## Architecture
+- Application containers generate logs
+- Filebeat ships logs
+- Logstash processes and forwards logs
+- Elasticsearch stores logs
+- Kibana visualizes logs and dashboards
 
-## Features
-- Centralized log collection from multiple services
-- Structured JSON logging
-- Real-time log ingestion and indexing
-- Search and filtering by service, log level, and time
-- Interactive dashboards for error analysis and observability
+## Dashboards
+- Error Logs Over Time
+- Logs by Service
+- Recent Error Logs Table
 
----
+## How to Run (Local)
 
-## Project Structure
-log-monitoring-dashboard/
-├── docker-compose.yml
-├── services/
-│ ├── Dockerfile
-│ ├── app1/app.py
-│ └── app2/app.py
-├── logstash/logstash.conf
-├── filebeat/filebeat.yml
-└── README.md
-
-yaml
-Copy code
-
----
-
-## How to Run Locally
-
-### Prerequisites
-- Docker Desktop (WSL2 enabled on Windows)
-- Docker Compose
-
-### Steps
 ```bash
-git clone https://github.com/<your-username>/log-monitoring-dashboard.git
-cd log-monitoring-dashboard
-docker compose up -d
-Open Kibana:
+docker compose down
+docker compose up -d --build
+Access
+Kibana: http://localhost:5601
 
-arduino
-Copy code
-http://localhost:5601
-Create Data View:
+Elasticsearch: http://localhost:9200
 
-Index pattern: app-logs-*
+Key Learnings
+Centralized logging with ELK
 
-Time field: @timestamp
+Dockerized observability stack
 
-Dashboards
-The Kibana dashboard includes:
+Kibana Lens dashboards
 
-Error logs over time
+Log filtering and indexing
 
-Logs grouped by service
+DevOps monitoring fundamentals
 
-Top recurring error messages
+Future Improvements
+Alerts on error spikes
 
-Learning Outcomes
-Implemented centralized logging using the ELK stack
+Metrics with Metricbeat
 
-Debugged real-world Docker, WSL, and Kibana startup issues
+Deployment to AWS (EC2 / ECS)
 
-Gained hands-on experience with observability and log pipelines
+Authentication & security
