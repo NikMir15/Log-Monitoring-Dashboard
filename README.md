@@ -1,56 +1,94 @@
-# Log Monitoring Dashboard (ELK Stack)
+# Log Monitoring Dashboard (ELK + Grafana)
 
 ## Overview
-This project demonstrates a production-style log monitoring system built using the ELK stack (Elasticsearch, Logstash, Kibana) with Docker.  
-It collects application logs, processes them centrally, and visualizes insights such as error trends and service-level logs in real time.
+This project implements a centralized log monitoring and visualization system using the **ELK stack (Elasticsearch)** integrated with **Grafana**.  
+It enables real-time log ingestion, indexing, and querying, providing operational visibility into application logs across containers.
 
-## Tech Stack
-- Docker & Docker Compose
-- Elasticsearch
-- Logstash
-- Kibana (Lens dashboards)
-- Filebeat
-- Python (sample apps)
-- Windows + VS Code
+The setup demonstrates how large-scale logs can be stored, queried, and monitored efficiently using cloud-native tooling.
+
+---
 
 ## Architecture
-- Application containers generate logs
-- Filebeat ships logs
-- Logstash processes and forwards logs
-- Elasticsearch stores logs
-- Kibana visualizes logs and dashboards
+- Application logs are collected and shipped into Elasticsearch
+- Logs are indexed using a daily index pattern (`app-logs-*`)
+- Grafana connects directly to Elasticsearch for querying and visualization
+- Dashboards provide insights such as total logs ingested and log distribution
 
-## Dashboards
-- Error Logs Over Time
-- Logs by Service
-- Recent Error Logs Table
+---
 
-## How to Run (Local)
+## Tech Stack
+- **Docker & Docker Compose**
+- **Elasticsearch**
+- **Grafana**
+- **Linux / Shell**
+- **REST APIs (Elasticsearch Query DSL)**
 
+---
+
+## Key Features
+- Centralized log storage using Elasticsearch
+- Scalable index pattern (`app-logs-*`)
+- Real-time log counting and querying
+- Grafana dashboards for log analytics
+- Containerized setup for easy local deployment
+
+---
+
+## Verification (Working Proof)
+Logs are successfully ingested and indexed in Elasticsearch.
+
+Example verification command:
 ```bash
-docker compose down
-docker compose up -d --build
-Access
-Kibana: http://localhost:5601
+curl http://localhost:9200/app-logs-*/_count
+Sample output:
+
+json
+Copy code
+{
+  "count": 2611238,
+  "successful": 1,
+  "failed": 0
+}
+This confirms:
+
+Elasticsearch is running
+
+Indexes exist
+
+Logs are being ingested correctly
+
+How to Run (Local)
+Prerequisites
+Docker
+
+Docker Compose
+
+Steps
+bash
+Copy code
+git clone <repository-url>
+cd log-monitoring-dashboard
+docker compose up -d
+Access:
 
 Elasticsearch: http://localhost:9200
 
-Key Learnings
-Centralized logging with ELK
+Grafana: http://localhost:3000
 
-Dockerized observability stack
+Learning Outcomes
+Hands-on experience with log aggregation and observability
 
-Kibana Lens dashboards
+Understanding Elasticsearch indexing and queries
 
-Log filtering and indexing
+Grafana dashboard creation using Elasticsearch as a data source
 
-DevOps monitoring fundamentals
+Container-based monitoring architecture
 
 Future Improvements
-Alerts on error spikes
+Add Logstash/Filebeat pipelines explicitly
 
-Metrics with Metricbeat
+Create alerting rules in Grafana
 
-Deployment to AWS (EC2 / ECS)
+Add severity-based dashboards (ERROR, WARN, INFO)
 
-Authentication & security
+Deploy to cloud (AWS / Azure) with managed Elasticsearch

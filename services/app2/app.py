@@ -1,27 +1,36 @@
 import json
-import time
+import os
 import random
-import datetime
+import time
+from datetime import datetime, timezone
 
-service = "app2"
-levels = ["INFO", "WARN", "ERROR"]
-messages = [
-    "Order created",
-    "Order updated",
-    "Inventory checked",
-    "External API call",
-    "Timeout talking to downstream service",
-    "Validation failed",
-    "Unknown exception occurred",
+SERVICE = os.getenv("SERVICE_NAME", "app2")
+
+LEVELS = ["INFO", "WARN", "ERROR"]
+MESSAGES = [
+    "Inventory updated",
+    "Message consumed from queue",
+    "Job completed",
+    "Low disk warning",
+    "API returned 500",
+    "Service degraded",
+    "Circuit breaker open",
+    "Upstream dependency unavailable",
 ]
 
-while True:
-    level = random.choices(levels, weights=[65, 25, 10])[0]
-    log = {
-        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
-        "service": service,
+def log(level: str, message: str):
+    event = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "service": SERVICE,
         "level": level,
-        "message": random.choice(messages),
+        "message": message,
+        "request_id": f"req-{random.randint(10000, 99999)}",
     }
-    print(json.dumps(log), flush=True)
-    time.sleep(random.uniform(0.2, 1.2))
+    print(json.dumps(event), flush=True)
+
+if __name__ == "__main__":
+    while True:
+        level = random.choices(LEVELS, weights=[65, 25, 10])[0]
+        msg = random.choice(MESSAGES)
+        log(level, msg)
+        time.sleep(random.uniform(0.2, 1.2))

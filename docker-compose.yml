@@ -1,7 +1,7 @@
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
-    mem_limit: 2g
+    container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -10,55 +10,70 @@ services:
       - "9200:9200"
     volumes:
       - esdata:/usr/share/elasticsearch/data
+    networks: [monitoring]
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.11.3
-    mem_limit: 1g
+    container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - SERVER_HOST=0.0.0.0
-      - SERVER_HTTP2_ENABLED=false
-      - ELASTIC_APM_ACTIVE=false
-    ports:
-      - "5601:5601"
     depends_on:
       - elasticsearch
+    ports:
+      - "5601:5601"
+    networks: [monitoring]
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.3
-    mem_limit: 1g
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - "5044:5044"
-    volumes:
-      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    environment:
+      - xpack.monitoring.enabled=false
     depends_on:
       - elasticsearch
-
-  app1:
-    build:
-      context: ./services/app1
-      dockerfile: ../Dockerfile
-    container_name: app1
-    restart: unless-stopped
-
-  app2:
-    build:
-      context: ./services/app2
-      dockerfile: ../Dockerfile
-    container_name: app2
-    restart: unless-stopped
+    networks: [monitoring]
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.11.3
+    container_name: filebeat
     user: root
-    mem_limit: 512m
-    command: ["--strict.perms=false"]
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       - logstash
+    networks: [monitoring]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - elasticsearch
+    networks: [monitoring]
+
+  app1:
+    build: ./services
+    container_name: app1
+    environment:
+      - APP_NAME=app1
+    networks: [monitoring]
+
+  app2:
+    build: ./services
+    container_name: app2
+    environment:
+      - APP_NAME=app2
+    networks: [monitoring]
 
 volumes:
   esdata:
+
+networks:
+  monitoring:
+

@@ -1,27 +1,36 @@
 import json
-import time
+import os
 import random
-import datetime
+import time
+from datetime import datetime, timezone
 
-service = "app1"
-levels = ["INFO", "WARN", "ERROR"]
-messages = [
-    "User login success",
-    "User logout",
-    "DB query executed",
+SERVICE = os.getenv("SERVICE_NAME", "app1")
+
+LEVELS = ["INFO", "WARN", "ERROR"]
+MESSAGES = [
+    "User login successful",
+    "Payment processed",
+    "Order created",
     "Cache miss",
-    "Payment gateway timeout",
-    "Invalid token",
-    "Rate limit triggered",
+    "DB connection retry",
+    "Timeout calling upstream service",
+    "Validation failed",
+    "Rate limit exceeded",
 ]
 
-while True:
-    level = random.choices(levels, weights=[70, 20, 10])[0]
-    log = {
-        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
-        "service": service,
+def log(level: str, message: str):
+    event = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "service": SERVICE,
         "level": level,
-        "message": random.choice(messages),
+        "message": message,
+        "request_id": f"req-{random.randint(1000, 9999)}",
     }
-    print(json.dumps(log), flush=True)
-    time.sleep(random.uniform(0.2, 1.2))
+    print(json.dumps(event), flush=True)
+
+if __name__ == "__main__":
+    while True:
+        level = random.choices(LEVELS, weights=[70, 20, 10])[0]
+        msg = random.choice(MESSAGES)
+        log(level, msg)
+        time.sleep(random.uniform(0.2, 1.0))

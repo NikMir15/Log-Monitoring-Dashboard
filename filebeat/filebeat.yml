@@ -1,14 +1,13 @@
-filebeat.inputs:
-  - type: filestream
-    id: docker-logs
-    paths:
-      - /var/lib/docker/containers/*/*.log
-    parsers:
-      - ndjson:
-          target: ""
-          add_error_key: true
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+processors:
+  - add_docker_metadata: ~
 
 output.logstash:
   hosts: ["logstash:5044"]
 
-setup.ilm.enabled: false
+logging.level: info
+
